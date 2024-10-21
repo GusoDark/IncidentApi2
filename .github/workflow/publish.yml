@@ -1,0 +1,27 @@
+name: Docker build & Publish
+
+on:
+  push:
+    branches:  # Corregido
+      - main
+    
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        run: docker login -u "${{ secrets.DOCKER_USERNAME }}" -p "${{ secrets.DOCKER_PASSWORD }}"
+
+      - name: Build Docker Image
+        run: docker build -t gustavr12/incident-api2:${{ github.sha }} .  # Corregido
+
+      - name: Tag Latest
+        run: docker tag gustavr12/incident-api2:${{ github.sha }} gustavr12/mono_map_api:latest
+
+      - name: Push Docker Image
+        run: |
+          docker push gustavr12/incident-api2:latest
+          docker push gustavr12/incident-api2:${{ github.sha }}
